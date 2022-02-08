@@ -1,0 +1,1339 @@
+﻿KPLABS Course 
+
+
+HashiCorp Certified: Vault Associate 
+
+
+
+
+
+
+Important Pointers for Exams
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ISSUED BY
+Zeal
+
+
+REPRESENTATIVE
+instructors@kplabs.in
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+Module 1: Dynamic Secrets
+
+
+Dynamic secrets allow you to generate credentials on-demand dynamically and are automatically revoked after a certain duration.
+
+
+Not all the secrets engine supports dynamic credentials.
+
+
+Common Supported Engines: AWS, Database, Google Cloud, Azure.
+
+
+Dynamic Secret does not provide any stronger cryptographic key generation.
+
+
+
+
+Module 2: Lease Management
+
+
+With every dynamic secret and service type authentication token, Vault creates a lease: metadata containing information such as a time duration, renewability, and more.
+
+
+Once the lease is expired, Vault can automatically revoke the data, and the consumer of the secret can no longer be certain that it is valid.
+
+
+  
+
+
+
+  
+
+
+
+Module 3: Transit Secrets Engine
+
+
+The transit secrets engine handles cryptographic functions on data-in-transit.
+
+
+All plaintext data must be base64-encoded.
+
+
+The reason for this requirement is that Vault does not require that the plaintext is "text". It could be a binary file such as a PDF or image.
+
+
+We can rotate encryption keys at regular intervals to ensure that not all data is encrypted with just 1 encryption key.
+
+
+
+
+
+
+Module 4: Transit Secrets Engine - Key Version
+
+
+The Transit engine supports the versioning of keys.
+
+
+Key versions that are earlier than a key's specified min_decryption_version get archived, and the rest of the key versions belong to the working set.
+
+
+This leads to both performance benefits as well as security benefits.
+
+
+By disallowing decryption of old versions of keys, found ciphertext to obsolete (but sensitive) data can not be decrypted, but in an emergency, the min_decryption_version can be moved back to allow for legitimate decryption.
+
+
+
+
+Module 5: Vault Policies
+
+
+Vault Policies are used to govern the access of users and roles (authorization)
+
+
+When you first initialize Vault, the root and default policy gets created by default.
+
+
+Policies are denied by default, so an empty policy grants no permission in the system.
+
+
+  
+
+
+
+
+
+
+
+Module 6: Default Policy
+
+
+The default policy is a built-in Vault policy that cannot be removed.
+
+
+By default, it is attached to all tokens, but can be explicitly excluded at token creation time by supporting authentication methods.
+
+
+The policy contains basic functionality such as the ability for the token to look up data about itself and to use its cubbyhole data. 
+
+
+However, Vault is not prescriptive about its contents. It can be modified to suit your needs;
+
+
+
+
+
+
+
+
+Module 7: ROOT Policy
+
+
+The root policy is a built-in Vault policy that can not be modified or removed.
+
+
+A root user can do anything within the Vault. As such, it is highly recommended that you revoke any root tokens before running Vault in production.
+
+
+When a Vault server is first initialized, there always exists one root user. This user is used to do the initial configuration and setup of Vault. 
+
+
+After configured, the initial root token should be revoked, and more strictly controlled users and authentication should be used.
+
+
+
+
+Module 8: Token Accessor
+
+
+This accessor is a value that acts as a reference to a token and can only be used to perform limited actions:
+
+
+* Lookup a token's properties (not including the actual token ID)
+* Lookup a token's capabilities on a path
+* Renew the token
+* Revoke the token
+
+
+
+
+  
+
+
+
+
+
+Module 9: Policy Association
+
+
+During the token creation time, the policy is associated with the token.
+
+
+At the later stage, if you attach a new policy to the user or role, it will not affect the existing tokens.
+
+
+For such cases, a new token must be created.
+
+
+A policy which is updated and is already attached to the token, the rules will be reflected accordingly as part of the token’s permission.
+
+
+
+
+Module 10: Token Capabilities
+
+
+The token capabilities command fetches the capabilities of a token for a given path.
+
+
+Token Accessor can also be used to check the capabilities of a specific token.
+
+
+  
+
+
+
+
+
+
+
+
+
+Module 11: Authentication Methods
+
+
+There are multiple authentication methods available in the Vault.
+
+
+After successful authentication, a token is generated which can be used for interaction with Vault.
+
+
+Remember that the GitHub auth method is a user-oriented method and is easiest to use for developers’ machines.
+
+
+For Servers, AppRole method is the recommended choice. 
+  
+
+
+
+
+
+
+
+Module 12: Disabling Auth Method
+
+
+A specific authentication method can be disabled with the following command:
+
+
+vault auth disable <method-name>
+
+
+When an auth method is disabled, all users authenticated via that method are automatically logged out.
+
+
+
+
+
+
+Module 13: Storage Backend
+
+
+Vault has multiple storage backends, each for different use-cases.
+
+
+Storage backends represent the location for the durable storage of Vault's information.
+
+
+Remember that not all the storage backends support high-availability. 
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+Module 14: Disabling Secret Engine
+
+
+The secrets disable command disables a secrets engine at a given PATH.
+
+
+Once a secrets engine is disabled, all secrets generated via the secrets engine are immediately revoked.
+
+
+  
+
+
+
+
+
+
+
+Module 15: Login based on UserPass Auth Method
+
+
+While logging in via userpass auth method, it is important to not define the password directly within the CLI command.
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+Module 15: Unseal Vault
+
+
+When a Vault server is started, it starts in a sealed state.
+
+
+Unsealing is the process of constructing the master key necessary to read the decryption key to decrypt the data, allowing access to the Vault.
+
+
+Unsealing is the process of reconstructing this master key.
+
+
+
+
+Module 16: Vault Agent
+The Agent does not persist anything to storage. Everything lives in memory.
+
+
+There are two primary functionalities related to Vault Agent:
+
+
+  
+
+
+
+
+
+Module 17: Response Wrapping Token
+
+
+When response wrapping is requested, Vault creates a temporary single-use token (wrapping token) and insert the response into the token's cubbyhole with a short TTL
+
+
+If the wrapping token is compromised and attacker unwraps the secret, the application will not be able to unwrap again and this can sound an alarm and you can revoke things accordingly.
+
+
+  
+
+Module 18: Shamir Secret Sharing for Unsealing Vault
+
+
+The storage backend is considered to be untrusted and Vault uses an encryption key which is used to protect all the data. That key is protected by a master key.
+
+
+Vault uses a technique known as Shamir's secret sharing algorithm to split the master key into 5 shares, any 3 of which are required to reconstruct the master key.
+
+
+
+
+
+
+  
+
+
+
+The best practice states that the key shares that are entered to get the master key should be done from a different workstation by different users having an individual key.
+
+
+
+
+Module 19: Seal Stanza
+
+
+The seal stanza configures the seal type to use for additional data protection, such as using HSM or Cloud KMS solutions to encrypt and decrypt the master key.
+
+
+This stanza is optional, and in the case of the master key, Vault will use the Shamir algorithm to cryptographically split the master key if this is not configured.
+
+
+  
+
+Module 20: Vault Replication
+For performance replication, secondary clusters will service reads locally.
+
+
+Some data is also stored locally and not replicated to the primary cluster.
+
+
+In DR, all the data is replicated but the secondary cluster cannot accept the client requests.
+
+
+
+
+  
+
+
+
+
+
+Module 21:  Entities and Aliases
+
+
+Each client is internally termed as an Entity. An entity can have multiple Aliases.
+
+
+The policy defined at Entity level are associated with the aliases. 
+
+
+  
+
+Module 22:  Identity Groups
+
+
+A group can contain multiple entities as its members.
+
+
+Policies set on the group is granted to all members of the group.
+
+
+
+
+  
+
+
+
+
+
+Module 23:  Vault Output
+
+
+We can have Vault output in the following mode:  Table, JSON, YAML
+
+
+The default is the Table.
+
+
+
+
+  
+
+Module 24:  Multiple Encryption Keys
+
+
+For Transit Engine, it is considered as a best practice to regularly rotate the encryption key.
+
+
+This limits the number of data encrypted via a single key.
+
+
+All the data should not be encrypted with the single encryption key.
+
+
+The above increases the risk.
+
+
+
+
+
+
+Module 25:  Reading Output From KV Path
+
+
+You want to be able to read a specific secret at secret/demosecret. Which capability needs to be used?
+
+
+There are two primary capabilities:
+
+
+* LIST 
+* READ
+
+
+List allows listing values at the given path.
+Read allows reading the data at the given path.
+
+
+
+
+Module 26:  Audit Devices
+
+
+Audit devices are the components in Vault that keep a detailed log of all requests and responses to Vault.
+
+
+When a Vault server is first initialized, no auditing is enabled. 
+
+
+Audit devices must be enabled by a root user using vault audit enable.
+
+
+Module 27:  Vault Browser CLI
+
+
+Allows running of basic CLI commands like write, read, delete, and list.
+
+
+
+
+You will not be able to perform various operations like creating new authentication methods and others.
+
+
+  
+
+
+
+
+
+
+
+Module 28:  Vault Token Lookup
+
+
+Be familiar with the output of the vault token lookup.
+
+
+  
+
+Module 29:  Orphan Tokens
+
+
+Orphan tokens are not children of their parents; therefore, orphan tokens do not expire when their parent does.
+
+
+They are the root of their own token tree.
+
+
+Orphan tokens still expire when their own max TTL is reached.
+
+
+
+
+  
+
+
+
+
+
+Module 30:  Create a Token with Explicit TTL
+
+
+TTL = Initial TTL to associate with the token.
+
+
+Explicit Max TTL = Maximum lifetime for the token. 
+Hard limits and cannot be exceeded.
+
+
+The system max TTL, which is 32 days but can be changed in the Vault's configuration file.
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+Module 31:  Renewing a Token
+
+
+vault token renew command can be used to extend the validity of the renewable tokens.
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+Module 32:  Basic Environment Variables
+
+
+
+
+VAULT_ADDR
+
+
+Address of the Vault server expressed as a URL and port, for example, https://127.0.0.1:8200/.
+
+
+http://127.0.0.1:8200 can also be replaced with http://8200
+
+
+
+
+  
+
+
+
+
+
+Module 33:  GUI Related Questions
+
+
+Be aware of how you can do an X step within the GUI.
+
+
+1. Delete Version 2 of the secret. 
+
+
+  
+
+
+
+
+
+Module 34:  Secrets Engine
+
+
+
+
+Multiple Secrets Engine of the same type can be enabled at a given time.
+
+
+We can distinguish them uniquely by separating them by the path.
+
+
+k/v secret engine mounted on /secret
+kv secret engine mounted on /kv
+
+
+Module 35:  Supported Backends - HashiCorp Support
+
+
+Following BackEnds are officially supported by HashiCorp.
+
+
+You will receive technical support for these backends.
+
+
+
+
+  
+
+
+
+
+
+
+
+Module 36:  Vault Enterprise Features
+
+
+
+
+Vault Enterprise includes a number of features that may be useful in specific workflows.
+
+
+It is important for us to understand the unique features that are part of Vault Enterprise.
+
+
+* Disaster Recovery
+* Namespaces
+* Monitoring
+* Multi-Factor Authentication
+* Auto-unseal with HSM
+
+
+
+
+
+
+
+
+
+
+.
+
+
+Module 37:  Vault Namespaces
+Namespaces are isolated environments that functionally exist as "Vaults within a Vault." 
+
+
+They have separate login paths and support creating and managing data isolated to their namespace
+
+
+Each namespace can have its own:
+* Policies
+* Auth Methods
+* Secrets Engines
+* Tokens
+* Identity entities and groups
+
+
+
+
+
+
+  
+
+
+
+Module 38:  Vault Replication
+
+
+Whenever you have replication enabled, all of the secondary clusters existing data will be destroyed. This is irrevocable. 
+
+
+Vault does not support an automatic failover/promotion of a DR secondary cluster
+
+
+Vault Replication is an Enterprise only feature. 
+
+
+DR replicated cluster will replicate all data from the primary cluster, including tokens. A performance replicated cluster, however, will not replicate the tokens from the primary.
+
+
+
+
+Module 39:  Auto-Completion Feature
+
+
+Vault Auto-Complete feature allows automatic completion for flags, subcommands, and arguments.
+
+
+Be sure to restart your shell after installing autocompletion!
+
+
+Installation Command:
+
+
+vault -autocomplete-install
+
+
+
+
+Module 40:  Vault CLI Commands
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Module 41:  Auto Unseal
+
+
+Auto Unseal delegates the responsibility of securing the unseal key from users to a trusted device or service
+
+
+The following are some of the supported services:
+
+
+* AWS KMS
+* Transit Secret Engine
+* Azure Key Vault
+* HSM
+* GCP Cloud KMS
+
+
+For private connectivity, VPC Endpoints can be used.
+
+
+Module 42:  Identify Output of Transit Engine
+
+
+vault write encryption/encrypt/demo plaintext=$(base64 <<< "Sample data")
+
+
+Output:
+
+
+vault:v3:+tkVyRMMSK+z9Ooa4H0Oa+v2rrMDJL2eouZuVyvInkeIQ+YH0g==
+
+
+* V3 indicates key version 3 was used to encrypt the plain text (3 version of keys exists)
+* The name of the keyring is demo
+* Transit Secret engine is mounted at /encryption path. 
+Module 43:  PKI Secrets Engine
+
+
+PKI Secrets Engine generates dynamic X.509 certificates
+
+
+Benefits of PKI Secrets Engine:
+
+
+* Vault can act as an Intermediate CA
+* Reducing, or eliminating certificate revocations
+* Reduces time to get a certificate by eliminating the need to generate a private key and CSR
+Module 44:  TOTP Secrets Engine
+
+
+TOTP stands for Time-based one-time passwords
+
+
+These are temporary passcodes and they typically expire after 30, 60, 120, or 240 seconds.
+
+
+The TOTP secrets engine can act as both a generator (like Google Authenticator) and a provider (like the Google.com sign-in service).
+
+
+  
+
+
+
+
+
+
+
+
+
+Module 45:  Vault Plugins
+
+
+All Vault auth and secret backends are considered plugins. 
+
+
+This simple concept allows both built-in and external plugins to be treated like Legos.
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+Module 46:  Telemetry in Vault
+
+
+Telemetry related metrics are available at /sys/metrics endpoint.
+
+
+Important metrics & logs to be analyzed:
+
+
+* Metrics
+* Vault Audit Logs 
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+Module 47:  Security Best Practices - Root Tokens
+
+
+
+
+It is generally considered a best practice to not persist root tokens.
+
+
+ Instead, a root token should be generated using Vault's operator generate-root command only when absolutely necessary
+
+
+For day-to-day operations, the root token should be deleted after configuring other auth methods.
+
+
+
+
+
+
+
+
+
+
+
+
+Module 48:  Enabling Versioning in KV - Version 1
+
+
+When you enable K/V Version 1, the versioning feature is not enabled by default.
+
+
+The kv enable-versioning command turns on versioning for an existing non-versioned key/value secrets engine (K/V Version 1) at its path.
+
+
+Note: This command also upgrades the KV from v1 to v2
+
+
+  
+
+
+
+
+
+Module 49:  Response Wrapping from UI
+
+
+This feature under Vault Tools allows you to achieve response wrapping functionality.
+
+
+  
+
+
+
+
+
+
+
+Module 50:  Path Templating
+
+
+Path Templating allows variable replacement based on information of the entity.
+
+
+  
+
+
+
+
+
+Module 51:  Service Tokens vs Batch Tokens
+
+
+  
+
+
+
+
+
+Module 52:  Vault Tools
+
+
+Vault contains a certain set of tools that will allow us to achieve a specific function.
+
+
+These are also available in the /sys/tools endpoint
+
+
+  
+
+
+
+
+
+Module 53:  Miscellaneous Pointers - 1
+
+
+root and default are the two default policies in Vault.
+
+
+When a lease is revoked, it invalidates that secret immediately and prevents any further renewals.
+
+
+To remove all secrets at a specific path:
+
+
+vault lease revoke -prefix <path>
+
+
+userpass auth method cannot read usernames and passwords from an external source.
+
+
+
+
+
+
+Module 54:  Miscellaneous Pointers - 2
+
+
+The /sys/leader endpoint is used to check the high availability status and current leader of Vault.
+
+
+vault operator init command initializes a Vault server
+
+
+Vault configuration file can be used to configure various settings like cluster name, storage backends, seal settings, and so on. Other things like namespaces, auth methods are directly configured within the vault itself. 
+
+
+The identity secrets engine is mounted by default in Vault.
+
+
+Storage backends are not trusted by Vault  
+ 
+
+
+Module 55:  Miscellaneous Pointers - 3
+
+
+Important Port Numbers:
+
+
+* 8200 = Vault API and UI 
+* 8201 - Cluster to Cluster communication
+
+
+Root tokens in the vault are not associated with TTLs and therefore they do not expire. 
+Non-root tokens are associated with TTLs.
+
+
+Default Max TTL of tokens is 32 days but it can be modified from the configuration file.
+
+
+Module 56  Miscellaneous Pointers - 4
+
+
+Transit Secret Engine does not store any data.
+
+
+If you receive the following error, make sure to set the VAULT_ADDR variable to HTTP 
+
+
+  
+
+
+
+
+
+After authentication, the CLI and GUI automatically assume the token for subsequent requests. API on the other hand will require to copy the token and use it for all subsequent requests.
+
+
+Module 57  Miscellaneous Pointers - 5
+
+
+Vault secrets engine supports various cloud providers like AWS, Azure, Alibaba Cloud & GCP.
+
+
+  
+
+
+
+
+
+Cubbyhole is a default secrets engine that is enabled for all the users.
+
+
+
+
+  
+
+
+
+Module 58  Miscellaneous Pointers - 6
+
+
+While generating dynamic secrets, vault returns the lease_id which can in turn be used with commands such as vault lease renew, revoke, and others.
+
+
+vault login command is used for authentication in CLI.
+
+
+After initializing, Vault provides the root token to the user, this is the only way to log in to Vault to configure additional auth methods.
+
+
+and * are the two characters that are used for denoting wildcard paths in policies.
+
+
+The Vault configuration file supports either JSON or HCL  
+
+
+
+
+
+
+Module 59 Miscellaneous Pointers -7
+
+
+When data is decrypted via transit engine, the output is in base64 format. To fetch the original plain-text data, you will have to decode the data with base64 -decode
+
+
+
+
+  
+
+
+
+
+
+Vault UI needs to be enabled from the configuration file and not the CLI.
+
+
+In order to renew a token, a user can issue a vault token renew command to extend the TTL
+
+
+
+
+
+
+Module 60 - Miscellaneous Pointers - 8
+
+
+When Vault is sealed, the only two options available are, viewing the vault status and unsealing the Vault.  All the other actions performed after the Vault is unsealed and the user is authenticated
+
+
+If Vault CLI is able to access a specific path (/secret/app/creds) but the user is not able to view it via GUI then the issue is related to missing LIST permission so that the user can browse the path that leads to a specific key-value path.
+
+
+If the secret has been manually removed, if you try to do a vault lease revoke, it will result in an error stating “credentials could not be found”. In such a case, you need to use the -force flag.
+
+
+
+
+Module 61 - Miscellaneous Pointers -9
+
+
+HashiCorp regularly updates the exams. This document contains a list of new areas that are covered in the new exams that are not part of this course yet.  
+
+
+Storage backend and HTTP API are outside of the security barrier hence can't be protected.
+
+
+WAL stands for Write-Ahead Logging. The changes are first recorded in the log, which must be written to stable storage before the changes are written to the datastore.
+
+
+Module 62 - Dealing with Larger Data Sizes - Transit Engine
+
+
+When the data size is large (say 10 GB), we do not want to send it over the network to Vault and get the encrypted data back. It will increase the latency and slow things down.
+
+
+Instead, you can generate a data key and encrypt it locally and use the same data key to decrypt it locally when needed.
+
+
+
+
+  
+
+
+
+
+
+
+
+Module 63 - Vault Policy Rules - Transit Engine
+Be aware of the important policy rules and capabilities related to transit engine.
+
+
+  
+
+
+
+Module 64 - Key Rotation in Vault
+It is not recommended to encrypt all of your data with one encryption key.
+
+
+Transit Engine allows customers to perform the encryption key rotation.
+
+
+Vault maintains the versioned keyring and the operator can decide the minimum version allowed for decryption operations. 
+
+
+  
+
+
+
+
+
+Module 65 - Min Decrypt Version
+
+
+With multiple version of keys, with the help of min_decryption_version , we can plan on which data can get decrypted.
+
+
+By disallowing decryption of old versions of keys, found ciphertext to obsolete (but sensitive) data can not be decrypted, but in an emergency, the min_decryption_version can be moved back to allow for legitimate decryption.
+
+
+  
+
+
+
+
+
+
+
+
+
+Module 66 - Periodic Tokens
+
+
+Periodic Tokens never expire provided that they are renewed.
+
+
+Outside of root tokens, it is currently the only way for a token in Vault to have an unlimited lifetime.
+
+
+  
+
+
+
+
+
+Module 67 - Vault High-Availability
+
+
+Vault supports a multi-server mode for high availability. This mode protects against outages by running multiple Vault servers
+
+
+The operator step-down forces the Vault server at the given address to step down from active duty
+
+
+Consul, and Integrated Storage (Raft) are some of the recommended storage backends.
+
+
+
+
+  
+
+
+
+
+
+
+
+Module 68 - Guide in Vault GUI 
+
+
+Vault GUI also provides the guide that gives information about various features
+
+
+
+
+  
+
+
+
+Module 69 - Vault Policy Format
+
+
+The policy fmt formats a local policy file to the policy specification.
+
+
+vault policy fmt file-name.hcl
+
+
+
+
+  
+
+
+
+
+
+
+
+Module 70 - Miscellaneous Pointers
+
+
+Kubernetes Authentication is required for Kubernetes based workload.
+
+
+Note that for Kubernetes Authentication, passing  JWT token is not required for all the API requests.
+
+
+/sys/seal endpoint is used to seal the vault. It requires a token with root policy or sudo capability on the path.
+
+
+For EC2 based workloads, you can make use of AWS Authentication Method
+
+
+Note that it is not mandatory to use the AWS auth method. You can always use other methods like AppRole.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Best of Luck for Exams, Rockstar!
